@@ -11,29 +11,31 @@ def brute_force(L):
 				ms, interval = sum_i2j, [i,j]
 	return ms, interval	
 
-def left_sum(L, left, right):
-	ms, cur_sum = L[right], 0
-	for i in range(right,left-1,-1):
+def left_sum(L):
+	ms, cur_sum = L[len(L)-1], L[len(L)-1]
+	for i in range(len(L)-2,-1,-1):
 		cur_sum += L[i]
 		if cur_sum > ms:
 			ms = cur_sum
 	return ms
 
-def right_sum(L, left, right):
-	ms, cur_sum = L[left], 0
-	for i in range(left, right+1):
+def right_sum(L):
+	ms, cur_sum = L[0], L[0]
+	for i in range(1, len(L)):
 		cur_sum += L[i]
 		if cur_sum > ms:
 			ms = cur_sum
 	return ms
 
 def max_sum(L):
-	if len(L) == 1
+	if len(L) == 1:
 		return L[0]
-	# compute max sums of two halves
-	# compute max sum of overlapping interval
-	# return the correct value
+	A, B = L[0:len(L)//2], L[len(L)//2:len(L)]
+	return max( max_sum(A), max_sum(B), left_sum(A)+right_sum(B) )
 
 prices = [10,-20,5,15,0,-10,15,-20,7,15]
-
+A = prices[0:len(prices)//2]
+B = prices[len(prices)//2:len(prices)]
+print(A, left_sum(A))
+print(B, right_sum(B))
 # print( brute_force(prices) )
