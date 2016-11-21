@@ -2,8 +2,8 @@
 item		weight				calories			cal/wt
 0				6					3000				500
 1				3					1400				467
-2				4					1600				400
-3				2					900					450
+2				2					900					450
+3				4					1600				400
 
 Cap = 10
 {0, 2}
@@ -17,7 +17,7 @@ def total(sol, L):
 	return sum( L[i] for i in sol)
 
 def Knapsack(cap, weight, calories, i, cur_weight):
-	global best, best_weight
+	global best
 	if i==N-1:
 		s = get_set(Config)
 		if cur_weight <= cap and (best==None or total(s, calories)>total(best, calories)):
@@ -30,8 +30,8 @@ def Knapsack(cap, weight, calories, i, cur_weight):
 
 
 def Knapsack2(cap, weight, calories, i, cur_weight, cur_cal):
-	global best, best_weight, best_cal
-	if promising(i, cur_weight, cap):
+	global best, best_cal
+	if promising(i, cur_weight, cur_cal, weight, calories, cap):
 		if i==N-1:
 			s = get_set(Config)
 			if best==None or total(s, calories)>best_cal:
@@ -43,8 +43,22 @@ def Knapsack2(cap, weight, calories, i, cur_weight, cur_cal):
 			Knapsack2(cap, weight, calories, i+1, cur_weight, cur_cal)
 
 
-def promising(i, cur_weight, cap):
+def promising(i, cur_weight, cur_cal, weight, calories, cap):
 	if cur_weight > cap:
+		return False
+	theoretical_best = cur_cal
+	theoretical_w = cur_weight
+	j = i+1
+	while j<N:
+		if theoretical_w + weight[j] <= cap:
+			theoretical_w += weight[j]
+			theoretical_best += calories[j]
+		else:
+			break
+		j += 1
+	if j<N and theoretical_w < cap:
+		theoretical_best += ((cap - theoretical_w) / weight[j]) * calories[j]
+	if best!=None and theoretical_best < best_cal:
 		return False
 	return True
 
@@ -53,7 +67,8 @@ def promising(i, cur_weight, cap):
 
 import util
 import time
-best, best_weight = None, 0
+import knapsack_dp
+best, best_cal = None, 0
 
 for N in range(15,25):
 	W = util.random_list(N, 10, 20)
@@ -62,14 +77,19 @@ for N in range(15,25):
 
 	start_time = time.time()
 	Config = [None]*N
-	best, best_weight = None, 0
+	best, best_cal = None, 0
 	Knapsack(Cap, W, C, -1, 0)
 	end_time = time.time()
 	print(N,end_time-start_time, best, Cap, total(best, W), total(best, C))
 
+	# start_time = time.time()
+	# Config = [None]*N
+	# best, best_cal = None, 0
+	# Knapsack2(Cap, W, C, -1, 0, 0)
+	# end_time = time.time()
+	# print(N,end_time-start_time, best, Cap, total(best, W), total(best, C))
+
 	start_time = time.time()
-	Config = [None]*N
-	best, best_weight = None, 0
-	Knapsack2(Cap, W, C, -1, 0, 0)
+	opt = knapsack_dp.Knapsack(W,C,Cap)
 	end_time = time.time()
-	print(N,end_time-start_time, best, Cap, total(best, W), total(best, C))
+	print(N,end_time-start_time, opt)
